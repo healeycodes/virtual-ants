@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <title>Virtual Ants</title>
+    <meta name="description" content="Bunch of ants" />
     <style>
         /* Remove top/left whitespace */
         * {
@@ -24,31 +26,32 @@
         canvas {
             display: block;
         }
+
+        /* Size the stats paragraph */
+        #stats {
+            font-family: 'Courier New', Courier, monospace;
+            height: 20px;
+        }
     </style>
 </head>
 
 <body>
+    <p id="stats">&nbsp;</p>
     <canvas id="screen"></canvas>
     <script>
         const WIDTH = window.innerWidth
-        const HEIGHT = window.innerHeight
+        const HEIGHT = window.innerHeight - 20
         const ANT_DIRECTIONS = ['u', 'r', 'd', 'l']
-        const ANT_CHANCE = 0.00035
+        const ANT_SPAWN_CHANCE = 0.00030
         const WHITE = 0
         const BLACK = 1
 
         const canvas = document.querySelector('#screen');
         canvas.width = WIDTH
         canvas.height = HEIGHT
-
         const ctx = canvas.getContext('2d');
-        ctx.scale(2, 2)
 
-        function clear() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
-        const boardXY = []
+        const boardXY = [] // [x][y]
         for (let i = 0; i < WIDTH; i++) {
             boardXY.push((new Array(HEIGHT).fill(WHITE)))
         }
@@ -57,13 +60,52 @@
         for (let x = 0; x < WIDTH; x++) {
             for (let y = 0; y < HEIGHT; y++) {
                 // Should we create an ant?
-                if (Math.random() < ANT_CHANCE) {
-                    // What's the ant's starting direction
-                    ants.push([x, y, ANT_DIRECTIONS[Math.floor(Math.random() * ANT_DIRECTIONS.length)]])
+                if (Math.random() < ANT_SPAWN_CHANCE) {
+                    // Ants start facing up
+                    ants.push([x, y, 'u'])
                 }
             }
         }
 
+        // Rotate direction clockwise or anti-clockwise
+        function rotateDirection(clockwise, dir) {
+            if (clockwise === true) {
+                return {
+                    'u': 'r',
+                    'r': 'd',
+                    'd': 'l',
+                    'l': 'u'
+                }[dir]
+            } else if (clockwise === false) {
+                return {
+                    'u': 'l',
+                    'l': 'd',
+                    'd': 'r',
+                    'r': 'u'
+                }[dir]
+            }
+        }
+
+        // To calculate FPS, count the frames over the last 1 second
+        const statsP = document.querySelector('#stats')
+        let fps = 0
+        let frames = []
+        function stats() {
+            const now = Date.now()
+            while (frames.length > 0 && frames[0] <= now - 1000) {
+                frames.shift()
+            }
+            frames.push(now)
+            fps = frames.length
+            statsP.innerHTML = `ants: ${ants.length}, fps: ${fps}, ` +
+                `<a href="https://en.wikipedia.org/wiki/Langton%27s_ant">Langton's Ant</a> ` +
+                `by <a href="https://twitter.com/healeycodes">@healeycodes</a> ` +
+                `(<i>view source</i> for code!)`
+        }
+
+
+        // Move each ant to their next state,
+        // draw the result of their action as we go
         function step() {
             for (let i = 0; i < ants.length; i++) {
                 let x = ants[i][0]
@@ -71,16 +113,23 @@
                 let dir = ants[i][2]
 
                 if (boardXY[x][y] === WHITE) {
+                    // At a white square,
+                    // turn 90° clockwise,
+                    // flip the color of the square,
                     boardXY[x][y] = BLACK
-                    dir = ANT_DIRECTIONS[(ANT_DIRECTIONS.indexOf(dir) + 1) % ANT_DIRECTIONS.length]
+                    dir = rotateDirection(true, dir)
                     ctx.fillStyle = 'black'
                 } else if (boardXY[x][y] === BLACK) {
+                    // At a black square,
+                    // turn 90° counter-clockwise, 
+                    // flip the color of the square,
                     boardXY[x][y] = WHITE
-                    dir = ANT_DIRECTIONS[(ANT_DIRECTIONS.indexOf(dir) - 1) % ANT_DIRECTIONS.length]
+                    dir = rotateDirection(false, dir)
                     ctx.fillStyle = 'white'
                 }
                 ctx.fillRect(x, y, 1, 1);
 
+                // Move forward one unit
                 if (dir === 'u') {
                     y -= 1
                 } else if (dir === 'r') {
@@ -91,6 +140,7 @@
                     x -= 1
                 }
 
+                // Wrap around edges by clamping (x, y)
                 if (x >= WIDTH) {
                     x = 0
                 } else if (x < 0) {
@@ -102,11 +152,18 @@
                     y = HEIGHT - 1
                 }
 
+                // Update this ant's state
                 ants[i] = [x, y, dir]
+
+                // Draw ant
+                ctx.fillStyle = 'blue'
+                ctx.fillRect(x, y, 1, 1);
             }
+            stats()
             requestAnimationFrame(step)
         }
 
+        // Start!
         step()
     </script>
 </body>
