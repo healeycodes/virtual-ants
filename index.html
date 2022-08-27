@@ -29,8 +29,9 @@
 
         /* Size the stats paragraph */
         #stats {
+            font-size: 12px;
             font-family: 'Courier New', Courier, monospace;
-            height: 20px;
+            height: 30px;
         }
     </style>
 </head>
@@ -39,8 +40,11 @@
     <p id="stats">&nbsp;</p>
     <canvas id="screen"></canvas>
     <script>
+        // Resources:
+        // - https://en.wikipedia.org/wiki/Langton%27s_ant
+        // - https://mitpress.mit.edu/9780262561273/the-computational-beauty-of-nature/
         const WIDTH = window.innerWidth
-        const HEIGHT = window.innerHeight - 20
+        const HEIGHT = window.innerHeight - 30
         const ANT_DIRECTIONS = ['u', 'r', 'd', 'l']
         const ANT_SPAWN_CHANCE = 0.00030
         const WHITE = 0
@@ -97,8 +101,9 @@
             }
             frames.push(now)
             fps = frames.length
-            statsP.innerHTML = `ants: ${ants.length}, fps: ${fps}, ` +
+            statsP.innerHTML = `Ants: ${ants.length}, FPS: ${fps}, ` +
                 `<a href="https://en.wikipedia.org/wiki/Langton%27s_ant">Langton's Ant</a> ` +
+                `<br/>` +
                 `by <a href="https://twitter.com/healeycodes">@healeycodes</a> ` +
                 `(<i>view source</i> for code!)`
         }
