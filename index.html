@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"
         integrity="sha512-zInFF17qBFVvvvFpIfeBzo7Tj7+rQxLeTJDmbxjBz5/zIr89YVbTNelNhdTT+/DCrxoVzBeUPVFJsczKbB7sew=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="mvp.css">
     <style>
         /* Remove top/left whitespace */
         * {
@@ -33,12 +34,11 @@
         .dropdown {
             position: relative;
             width: 150px;
-            font-size: 12px;
         }
 
         .dropdown select {
             width: 100%;
-            height: 26px;
+            margin-bottom: 0;
         }
 
         .dropdown>* {
@@ -47,20 +47,14 @@
         }
 
         .dropdown input {
-            height: 26px;
             position: absolute;
             width: calc(100% - 20px);
-        }
-
-        input[type='text'] {
-            font-size: 18px;
         }
 
         /* Intro text */
         .intro {
             padding: 15px;
             font-family: monospace;
-            font-size: 18px;
         }
     </style>
 </head>
