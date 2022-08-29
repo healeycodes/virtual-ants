@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"
         integrity="sha512-zInFF17qBFVvvvFpIfeBzo7Tj7+rQxLeTJDmbxjBz5/zIr89YVbTNelNhdTT+/DCrxoVzBeUPVFJsczKbB7sew=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="reset-mobile.css">
     <style>
         /* Remove top/left whitespace */
         * {
@@ -30,6 +31,7 @@
         .dropdown {
             position: relative;
             width: 150px;
+            font-size: 12px;
         }
 
         .dropdown select {
@@ -60,7 +62,8 @@
         with <a href="https://en.wikipedia.org/wiki/Langton%27s_ant#Extension_to_multiple_colors">multi-color
             extension</a>
         <br />
-        - Read my blog post <a href="javascript:alert('coming soon..')">Virtual Ants</a>
+        - Read my blog post <a href="javascript:alert('coming soon..')">Virtual Ants</a> / <a
+            href="https://github.com/healeycodes/virtual-ants">View Repository</a>
         <br />
         - Select rules/ant chance:
     </p>
@@ -97,7 +100,7 @@
         // - https://en.wikipedia.org/wiki/Langton%27s_ant
         // - https://mitpress.mit.edu/9780262561273/the-computational-beauty-of-nature/
 
-        const TOP_SECTION_HEIGHT = 90
+        const TOP_SECTION_HEIGHT = 86
         const CANVAS_WIDTH = round2even(window.innerWidth)
         const CANVAS_HEIGHT = round2even(window.innerHeight) - TOP_SECTION_HEIGHT
         const ANT_DIRECTIONS = ['u', 'r', 'd', 'l']
