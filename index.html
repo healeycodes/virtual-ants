@@ -28,6 +28,10 @@
         }
 
         /* Dropdowns (https://stackoverflow.com/a/31474567) */
+        .dropdowns {
+            padding-left: 15px;
+        }
+
         .dropdown {
             position: relative;
             width: 150px;
@@ -50,7 +54,8 @@
 
         /* Intro text */
         .intro {
-            height: 50px;
+            height: 65px;
+            padding: 15px;
             font-family: monospace;
         }
     </style>
@@ -58,40 +63,44 @@
 
 <body>
     <p class="intro">
-        - <a href="https://en.wikipedia.org/wiki/Langton%27s_ant">Langton's Ant</a>
+        - <a href="https://en.wikipedia.org/wiki/Langton%27s_ant">🐜 Langton's Ant</a>
         with <a href="https://en.wikipedia.org/wiki/Langton%27s_ant#Extension_to_multiple_colors">multi-color
             extension</a>
         <br />
-        - Read my blog post <a href="javascript:alert('coming soon..')">Virtual Ants</a> / <a
-            href="https://github.com/healeycodes/virtual-ants">View Repository</a>
+        - Read my blog post <a href="javascript:alert('coming soon..')">Virtual Ants</a>
+        <br />
+        - <a href="https://github.com/healeycodes/virtual-ants">View Source</a>
         <br />
         - Select rules/ant chance:
     </p>
 
     <!-- https://stackoverflow.com/a/31474567 -->
-    <div class="dropdown">
-        <input id="rules" type="text" value="RL" oninput="this.setAttribute('value', this.value); langtonAntCanvas()" />
-        <select
-            onchange="this.previousElementSibling.value=this.value; this.previousElementSibling.focus(); this.previousElementSibling.dispatchEvent(new Event('input', {bubbles:true}));"">
+    <div class="dropdowns">
+        <div class="dropdown">
+            <input id="rules" type="text" value="RL"
+                oninput="this.setAttribute('value', this.value); langtonAntCanvas()" />
+            <select
+                onchange="this.previousElementSibling.value=this.value; this.previousElementSibling.focus(); this.previousElementSibling.dispatchEvent(new Event('input', {bubbles:true}));"">
             <option selected value=" RL">RL (Langton's Ant)</option>
-            <option value="RLLR">RLLR (Symmetrical mandala)</option>
-        </select>
-    </div>
-    <div class="dropdown">
-        <input id="antChance" type="text" value="Single Ant"
-            oninput="this.setAttribute('value', this.value); langtonAntCanvas()" />
-        <select
-            onchange="this.previousElementSibling.value=this.value; this.previousElementSibling.focus(); this.previousElementSibling.dispatchEvent(new Event('input', {bubbles:true}));">
-            <option value="Single Ant">Single Ant</option>
-            <option value=".01">.01</option>
-            <option value=".03">.03</option>
-            <option value=".06">.06</option>
-            <option value=".09">.09</option>
-            <option value=".2">.2</option>
-        </select>
+                <option value="RLLR">RLLR (Symmetrical mandala)</option>
+            </select>
+        </div>
+        <div class="dropdown">
+            <input id="antChance" type="text" value="Single Ant"
+                oninput="this.setAttribute('value', this.value); langtonAntCanvas()" />
+            <select
+                onchange="this.previousElementSibling.value=this.value; this.previousElementSibling.focus(); this.previousElementSibling.dispatchEvent(new Event('input', {bubbles:true}));">
+                <option value="Single Ant">Single Ant</option>
+                <option value=".01">.01</option>
+                <option value=".03">.03</option>
+                <option value=".06">.06</option>
+                <option value=".09">.09</option>
+                <option value=".2">.2</option>
+            </select>
+        </div>
     </div>
 
-    <canvas></canvas>
+    <canvas />
 
     <script>
         // https://github.com/healeycodes/virtual-ants
@@ -99,10 +108,9 @@
         // Resources:
         // - https://en.wikipedia.org/wiki/Langton%27s_ant
         // - https://mitpress.mit.edu/9780262561273/the-computational-beauty-of-nature/
-
-        const TOP_SECTION_HEIGHT = 86
+        const TOP_SECTION_HEIGHT = 132
         const CANVAS_WIDTH = round2even(window.innerWidth)
-        const CANVAS_HEIGHT = round2even(window.innerHeight) - TOP_SECTION_HEIGHT
+        const CANVAS_HEIGHT = round2even(window.innerHeight - TOP_SECTION_HEIGHT)
         const ANT_DIRECTIONS = ['u', 'r', 'd', 'l']
         const UNITS = 4
 
