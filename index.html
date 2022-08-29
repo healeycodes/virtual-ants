@@ -8,6 +8,9 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <title>Virtual Ants</title>
     <meta name="description" content="Bunch of ants" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"
+        integrity="sha512-zInFF17qBFVvvvFpIfeBzo7Tj7+rQxLeTJDmbxjBz5/zIr89YVbTNelNhdTT+/DCrxoVzBeUPVFJsczKbB7sew=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         /* Remove top/left whitespace */
         * {
@@ -20,55 +23,100 @@
         body {
             width: 100%;
             height: 100%;
+            overflow-y: hidden;
         }
 
-        /* Remove scrollbars */
-        canvas {
-            display: block;
+        /* Dropdowns (https://stackoverflow.com/a/31474567) */
+        .dropdown {
+            position: relative;
+            width: 150px;
         }
 
-        /* Size the stats paragraph */
-        #stats {
-            font-size: 12px;
-            font-family: 'Courier New', Courier, monospace;
-            height: 30px;
+        .dropdown select {
+            width: 100%;
+        }
+
+        .dropdown>* {
+            box-sizing: border-box;
+            height: 1.5em;
+        }
+
+        .dropdown input {
+            position: absolute;
+            width: calc(100% - 20px);
+        }
+
+        /* Intro text */
+        .intro {
+            height: 50px;
+            font-family: monospace;
         }
     </style>
 </head>
 
 <body>
-    <p id="stats">&nbsp;</p>
-    <canvas id="screen"></canvas>
+    <p class="intro">
+        - <a href="https://en.wikipedia.org/wiki/Langton%27s_ant">Langton's Ant</a>
+        with <a href="https://en.wikipedia.org/wiki/Langton%27s_ant#Extension_to_multiple_colors">multi-color
+            extension</a>
+        <br />
+        - Read my blog post <a href="javascript:alert('coming soon..')">Virtual Ants</a>
+        <br />
+        - Select rules/ant chance:
+    </p>
+
+    <!-- https://stackoverflow.com/a/31474567 -->
+    <div class="dropdown">
+        <input id="rules" type="text" value="RL" oninput="this.setAttribute('value', this.value); langtonAntCanvas()" />
+        <select
+            onchange="this.previousElementSibling.value=this.value; this.previousElementSibling.focus(); this.previousElementSibling.dispatchEvent(new Event('input', {bubbles:true}));"">
+            <option selected value=" RL">RL (Langton's Ant)</option>
+            <option value="RLLR">RLLR (Symmetrical mandala)</option>
+        </select>
+    </div>
+    <div class="dropdown">
+        <input id="antChance" type="text" value="Single Ant"
+            oninput="this.setAttribute('value', this.value); langtonAntCanvas()" />
+        <select
+            onchange="this.previousElementSibling.value=this.value; this.previousElementSibling.focus(); this.previousElementSibling.dispatchEvent(new Event('input', {bubbles:true}));">
+            <option value="Single Ant">Single Ant</option>
+            <option value=".01">.01</option>
+            <option value=".03">.03</option>
+            <option value=".06">.06</option>
+            <option value=".09">.09</option>
+            <option value=".2">.2</option>
+        </select>
+    </div>
+
+    <canvas></canvas>
+
     <script>
+        // https://github.com/healeycodes/virtual-ants
+
         // Resources:
         // - https://en.wikipedia.org/wiki/Langton%27s_ant
         // - https://mitpress.mit.edu/9780262561273/the-computational-beauty-of-nature/
-        const WIDTH = window.innerWidth
-        const HEIGHT = window.innerHeight - 30
+
+        const TOP_SECTION_HEIGHT = 90
+        const CANVAS_WIDTH = round2even(window.innerWidth)
+        const CANVAS_HEIGHT = round2even(window.innerHeight) - TOP_SECTION_HEIGHT
         const ANT_DIRECTIONS = ['u', 'r', 'd', 'l']
-        const ANT_SPAWN_CHANCE = 0.00030
-        const WHITE = 0
-        const BLACK = 1
+        const UNITS = 4
 
-        const canvas = document.querySelector('#screen');
-        canvas.width = WIDTH
-        canvas.height = HEIGHT
-        const ctx = canvas.getContext('2d');
-
-        const boardXY = [] // [x][y]
-        for (let i = 0; i < WIDTH; i++) {
-            boardXY.push((new Array(HEIGHT).fill(WHITE)))
+        // Random color palette given a length
+        // using colorbrewer2 as a source
+        function randomColorPalette(len) {
+            const palettes = Object.keys(chroma.brewer)
+            const randomBrewer =
+                chroma.brewer[palettes[Math.floor(Math.random() * palettes.length)]];
+            return chroma
+                .scale(randomBrewer)
+                .mode("lch")
+                .colors(len);
         }
 
-        const ants = [] // [x, y, direction]
-        for (let x = 0; x < WIDTH; x++) {
-            for (let y = 0; y < HEIGHT; y++) {
-                // Should we create an ant?
-                if (Math.random() < ANT_SPAWN_CHANCE) {
-                    // Ants start facing up
-                    ants.push([x, y, 'u'])
-                }
-            }
+        function round2even(num) {
+            return 2 * Math.floor(num / 2)
         }
 
         // Rotate direction clockwise or anti-clockwise
@@ -90,86 +138,117 @@
             }
         }
 
-        // To calculate FPS, count the frames over the last 1 second
-        const statsP = document.querySelector('#stats')
-        let fps = 0
-        let frames = []
-        function stats() {
-            const now = Date.now()
-            while (frames.length > 0 && frames[0] <= now - 1000) {
-                frames.shift()
+        // Create a Langton Ant simulation
+        function langtonAntCanvas() {
+            // Fetch rules and antChance from DOM
+            const rules = document.querySelector('#rules').value
+            let antChance = document.querySelector('#antChance').value
+
+            // Allow the single ant branch for non-numerical values like 'Single Ant'
+            if (isNaN(Number(antChance))) {
+                antChance = -1
+            } else {
+                // Otherwise, turn into a float percentage
+                antChance / 100
             }
-            frames.push(now)
-            fps = frames.length
-            statsP.innerHTML = `Ants: ${ants.length}, FPS: ${fps}, ` +
-                `<a href="https://en.wikipedia.org/wiki/Langton%27s_ant">Langton's Ant</a> ` +
-                `<br/>` +
-                `by <a href="https://twitter.com/healeycodes">@healeycodes</a> ` +
-                `(<i>view source</i> for code!)`
+
+            // Clear up existing canvases, and create a new one
+            document.querySelectorAll('canvas').forEach(canvas => canvas.remove())
+            const canvas = document.createElement('canvas')
+            document.body.append(canvas)
+
+            // Size the canvas
+            canvas.width = CANVAS_WIDTH
+            canvas.height = CANVAS_HEIGHT
+            const ctx = canvas.getContext('2d');
+
+            // Generate palette (and take rule length into account)
+            const palette = randomColorPalette(rules.length)
+            const colors = rules.toLowerCase().split('').map((x, i) => {
+                return [x, palette[i]]
+            })
+
+            const boardXY = [] // 2D array of rule indexes
+            for (let i = 0; i < CANVAS_WIDTH; i++) {
+                boardXY.push((new Array(CANVAS_HEIGHT).fill(0)))
+            }
+
+            const ants = [] // 2D array of X, Y, direction
+            if (antChance === -1) {
+                // Create a single ant in the center
+                ants.push([
+                    CANVAS_WIDTH / 2,
+                    CANVAS_HEIGHT / 2,
+                    'u'
+                ])
+            } else {
+                // Randomly place ants given the ant chance
+                for (let x = 0; x < CANVAS_WIDTH; x += UNITS) {
+                    for (let y = 0; y < CANVAS_HEIGHT; y += UNITS) {
+                        if (Math.random() < antChance / 100) {
+                            ants.push([x, y, 'u'])
+                        }
+                    }
+                }
+            }
+
+            // Move each ant to their next state,
+            // draw the result of their action as we go
+            function step() {
+                for (let i = 0; i < ants.length; i++) {
+                    let x = ants[i][0]
+                    let y = ants[i][1]
+                    let dir = ants[i][2]
+
+                    // The cell's state informs this ant's next move
+                    let colorsIndex = boardXY[x][y]
+                    const turnDir = colors[colorsIndex][0]
+                    if (turnDir === 'r') {
+                        dir = rotateDirection(true, dir)
+                    } else if (turnDir === 'l') {
+                        dir = rotateDirection(false, dir)
+                    }
+
+                    // Increment the cell's state
+                    boardXY[x][y] = colorsIndex + 1 < colors.length ?
+                        colorsIndex + 1 : 0
+                    ctx.fillStyle = colors[colorsIndex][1]
+                    ctx.fillRect(x, y, UNITS, UNITS);
+
+                    // Move forward one unit
+                    if (dir === 'u') {
+                        y -= UNITS
+                    } else if (dir === 'r') {
+                        x += UNITS
+                    } else if (dir === 'd') {
+                        y += UNITS
+                    } else if (dir === 'l') {
+                        x -= UNITS
+                    }
+
+                    // Wrap around edges by clamping
+                    if (x >= CANVAS_WIDTH) {
+                        x = 0
+                    } else if (x < 0) {
+                        x = CANVAS_WIDTH - 1
+                    }
+                    if (y >= CANVAS_HEIGHT) {
+                        y = 0
+                    } else if (y < 0) {
+                        y = CANVAS_HEIGHT - 1
+                    }
+
+                    // Update this ant's state
+                    ants[i] = [x, y, dir]
+                }
+                requestAnimationFrame(step)
+            }
+
+            // Start!
+            step()
         }
 
-
-        // Move each ant to their next state,
-        // draw the result of their action as we go
-        function step() {
-            for (let i = 0; i < ants.length; i++) {
-                let x = ants[i][0]
-                let y = ants[i][1]
-                let dir = ants[i][2]
-
-                if (boardXY[x][y] === WHITE) {
-                    // At a white square,
-                    // turn 90° clockwise,
-                    // flip the color of the square,
-                    boardXY[x][y] = BLACK
-                    dir = rotateDirection(true, dir)
-                    ctx.fillStyle = 'black'
-                } else if (boardXY[x][y] === BLACK) {
-                    // At a black square,
-                    // turn 90° counter-clockwise, 
-                    // flip the color of the square,
-                    boardXY[x][y] = WHITE
-                    dir = rotateDirection(false, dir)
-                    ctx.fillStyle = 'white'
-                }
-                ctx.fillRect(x, y, 1, 1);
-
-                // Move forward one unit
-                if (dir === 'u') {
-                    y -= 1
-                } else if (dir === 'r') {
-                    x += 1
-                } else if (dir === 'd') {
-                    y += 1
-                } else if (dir === 'l') {
-                    x -= 1
-                }
-
-                // Wrap around edges by clamping (x, y)
-                if (x >= WIDTH) {
-                    x = 0
-                } else if (x < 0) {
-                    x = WIDTH - 1
-                }
-                if (y >= HEIGHT) {
-                    y = 0
-                } else if (y < 0) {
-                    y = HEIGHT - 1
-                }
-
-                // Update this ant's state
-                ants[i] = [x, y, dir]
-
-                // Draw ant
-                ctx.fillStyle = 'blue'
-                ctx.fillRect(x, y, 1, 1);
-            }
-            stats()
-            requestAnimationFrame(step)
-        }
-
-        // Start!
-        step()
+        langtonAntCanvas()
     </script>
 </body>
 
