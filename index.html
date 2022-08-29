@@ -18,7 +18,6 @@
             padding: 0;
         }
 
-        /* Ensure we're full screen*/
         html,
         body {
             width: 100%;
@@ -39,7 +38,7 @@
 
         .dropdown select {
             width: 100%;
-            height: 20px;
+            height: 26px;
         }
 
         .dropdown>* {
@@ -48,23 +47,27 @@
         }
 
         .dropdown input {
+            height: 26px;
             position: absolute;
             width: calc(100% - 20px);
+        }
+
+        input[type='text'] {
+            font-size: 18px;
         }
 
         /* Intro text */
         .intro {
             padding: 15px;
             font-family: monospace;
+            font-size: 18px;
         }
     </style>
 </head>
 
 <body>
     <p class="intro">
-        - <a href="https://en.wikipedia.org/wiki/Langton%27s_ant">🐜 Langton's Ant</a>
-        with <a href="https://en.wikipedia.org/wiki/Langton%27s_ant#Extension_to_multiple_colors">multi-color
-            extension</a>
+        - <a href="https://en.wikipedia.org/wiki/Langton%27s_ant">Langton's Ant</a>
         <br />
         - Read my blog post <a href="javascript:alert('coming soon..')">Virtual Ants</a>
         <br />
@@ -109,10 +112,9 @@
         // Resources:
         // - https://en.wikipedia.org/wiki/Langton%27s_ant
         // - https://mitpress.mit.edu/9780262561273/the-computational-beauty-of-nature/
-        const TOP_SECTION_HEIGHT = 132
+        const TOP_SECTION_HEIGHT = 170
         const CANVAS_WIDTH = round2even(window.innerWidth)
         const CANVAS_HEIGHT = round2even(window.innerHeight - TOP_SECTION_HEIGHT)
-        const ANT_DIRECTIONS = ['u', 'r', 'd', 'l']
         const UNITS = 4
 
         // Random color palette given a length
