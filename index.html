@@ -54,7 +54,6 @@
 
         /* Intro text */
         .intro {
-            height: 65px;
             padding: 15px;
             font-family: monospace;
         }
@@ -77,11 +76,13 @@
     <!-- https://stackoverflow.com/a/31474567 -->
     <div class="dropdowns">
         <div class="dropdown">
-            <input id="rules" type="text" value="RL"
+            <input id="rules" type="text" value="RRLRR"
                 oninput="this.setAttribute('value', this.value); langtonAntCanvas()" />
             <select
                 onchange="this.previousElementSibling.value=this.value; this.previousElementSibling.focus(); this.previousElementSibling.dispatchEvent(new Event('input', {bubbles:true}));"">
-            <option selected value=" RL">RL (Langton's Ant)</option>
+                <option value=" RL">RL (Langton's Ant)</option>
+                <option value="RRLRLRR">RRLRLRR (Triangle)</option>
+                <option selected value="RRLRR">RRLRR (Square)</option>
                 <option value="RLLR">RLLR (Symmetrical mandala)</option>
             </select>
         </div>
@@ -90,7 +91,7 @@
                 oninput="this.setAttribute('value', this.value); langtonAntCanvas()" />
             <select
                 onchange="this.previousElementSibling.value=this.value; this.previousElementSibling.focus(); this.previousElementSibling.dispatchEvent(new Event('input', {bubbles:true}));">
-                <option value="Single Ant">Single Ant</option>
+                <option selected value="Single Ant">Single Ant</option>
                 <option value=".01">.01</option>
                 <option value=".03">.03</option>
                 <option value=".06">.06</option>
@@ -175,7 +176,7 @@
 
             // Generate palette (and take rule length into account)
             const palette = randomColorPalette(rules.length)
-            const colors = rules.toLowerCase().split('').map((x, i) => {
+            const colors = rules.trim().toLowerCase().split('').map((x, i) => {
                 return [x, palette[i]]
             })
 
