@@ -282,12 +282,12 @@
                     if (x >= CANVAS_WIDTH) {
                         x = 0
                     } else if (x < 0) {
-                        x = CANVAS_WIDTH - 1
+                        x = (CANVAS_WIDTH - 1) - ((CANVAS_WIDTH - 1) % UNITS)
                     }
                     if (y >= CANVAS_HEIGHT) {
                         y = 0
                     } else if (y < 0) {
-                        y = CANVAS_HEIGHT - 1
+                        y = (CANVAS_HEIGHT - 1) - ((CANVAS_HEIGHT - 1) % UNITS)
                     }
 
                     // Update this ant's state
