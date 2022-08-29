@@ -7,11 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <title>Virtual Ants</title>
-    <meta name="description" content="Bunch of ants" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"
-        integrity="sha512-zInFF17qBFVvvvFpIfeBzo7Tj7+rQxLeTJDmbxjBz5/zIr89YVbTNelNhdTT+/DCrxoVzBeUPVFJsczKbB7sew=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <link rel="stylesheet" href="mvp.css">
+    <meta name="description" content="Langton's Ant Playground" />
+    <script src="chroma.min.js"></script>
+    <link rel="stylesheet" href="mvp.css" />
     <style>
         /* Remove top/left whitespace */
         * {
@@ -54,6 +52,7 @@
         /* Intro text */
         .intro {
             padding: 15px;
+            margin-bottom: 0;
             font-family: monospace;
         }
     </style>
@@ -64,8 +63,6 @@
         - <a href="https://en.wikipedia.org/wiki/Langton%27s_ant">Langton's Ant</a>
         <br />
         - Read my blog post <a href="javascript:alert('coming soon..')">Virtual Ants</a>
-        <br />
-        - <a href="https://github.com/healeycodes/virtual-ants">View Source</a>
         <br />
         - Select rules/ant chance:
     </p>
@@ -106,7 +103,8 @@
         // Resources:
         // - https://en.wikipedia.org/wiki/Langton%27s_ant
         // - https://mitpress.mit.edu/9780262561273/the-computational-beauty-of-nature/
-        const TOP_SECTION_HEIGHT = 170
+        const TOP_SECTION_HEIGHT = document.querySelector('.intro').style.height +
+            document.querySelector('.dropdowns').style.height
         const CANVAS_WIDTH = round2even(window.innerWidth)
         const CANVAS_HEIGHT = round2even(window.innerHeight - TOP_SECTION_HEIGHT)
         const UNITS = 4
