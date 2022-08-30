@@ -21,7 +21,7 @@
         body {
             width: 100%;
             height: 100%;
-            overflow-y: hidden;
+            font-family: monospace;
         }
 
         /* Dropdowns (https://stackoverflow.com/a/31474567) */
@@ -52,9 +52,9 @@
 
         /* Intro text */
         .intro {
-            padding: 0 15px 15px;
-            margin-bottom: 0;
-            font-family: monospace;
+            margin-bottom: 15px;
+            margin-top: 0;
+            font-size: 18px;
         }
     </style>
 </head>
@@ -106,11 +106,12 @@
     </style>
 
     <p class="intro">
-        - <a href="https://en.wikipedia.org/wiki/Langton%27s_ant">Langton's Ant</a>
+        <!-- Don't tell anyone I used non-breaking spaces for padding here -->
+        &nbsp;&nbsp;Langton's Ant (w/ multi-color).
         <br />
-        - Read my blog post <a href="javascript:alert('coming soon..')">Virtual Ants</a>
+        &nbsp;&nbsp;Read my blog post <a href="javascript:alert('coming soon..')">Virtual Ants</a>.
         <br />
-        - Select rules/ant chance:
+        &nbsp;&nbsp;Select rules/ant chance:
     </p>
 
     <!-- https://stackoverflow.com/a/31474567 -->
@@ -151,9 +152,6 @@
         // Resources:
         // - https://en.wikipedia.org/wiki/Langton%27s_ant
         // - https://mitpress.mit.edu/9780262561273/the-computational-beauty-of-nature/
-        const CANVAS_WIDTH = round2even(window.innerWidth)
-        const CANVAS_HEIGHT = round2even(window.innerHeight - document.querySelector('canvas').offsetHeight)
-        const UNITS = 4
 
         // Random color palette given a length
         // using colorbrewer2 as a source
@@ -192,6 +190,10 @@
 
         // Create a Langton Ant simulation
         function langtonAntCanvas() {
+
+            // Grid unit size (also defines the draw size)
+            const UNITS = 4
+
             // Fetch rules and antChance from DOM
             const rules = document.querySelector('#rules').value
             let antChance = document.querySelector('#antChance').value
@@ -210,8 +212,10 @@
             document.body.append(canvas)
 
             // Size the canvas
-            canvas.width = CANVAS_WIDTH
-            canvas.height = CANVAS_HEIGHT
+            const canvasWidth = round2even(window.innerWidth)
+            const canvasHeight = round2even(window.innerHeight - canvas.offsetHeight)
+            canvas.width = canvasWidth
+            canvas.height = canvasHeight
             const ctx = canvas.getContext('2d');
 
             // Generate palette (and take rule length into account)
@@ -221,22 +225,22 @@
             })
 
             const boardXY = [] // 2D array of rule indexes
-            for (let i = 0; i < CANVAS_WIDTH; i++) {
-                boardXY.push((new Array(CANVAS_HEIGHT).fill(0)))
+            for (let i = 0; i < canvasWidth; i++) {
+                boardXY.push((new Array(canvasHeight).fill(0)))
             }
 
             const ants = [] // 2D array of X, Y, direction
             if (antChance === -1) {
                 // Create a single ant in the center
                 ants.push([
-                    CANVAS_WIDTH / 2,
-                    CANVAS_HEIGHT / 2,
+                    (canvasWidth / 2) - ((canvasWidth / 2) % UNITS),
+                    (canvasHeight / 2) - ((canvasHeight / 2) % UNITS),
                     'u'
                 ])
             } else {
                 // Randomly place ants given the ant chance
-                for (let x = 0; x < CANVAS_WIDTH; x += UNITS) {
-                    for (let y = 0; y < CANVAS_HEIGHT; y += UNITS) {
+                for (let x = 0; x < canvasWidth; x += UNITS) {
+                    for (let y = 0; y < canvasHeight; y += UNITS) {
                         if (Math.random() < antChance / 100) {
                             ants.push([x, y, 'u'])
                         }
@@ -279,15 +283,15 @@
                     }
 
                     // Wrap around edges by clamping
-                    if (x >= CANVAS_WIDTH) {
+                    if (x >= canvasWidth) {
                         x = 0
                     } else if (x < 0) {
-                        x = (CANVAS_WIDTH - 1) - ((CANVAS_WIDTH - 1) % UNITS)
+                        x = (canvasWidth - 1) - ((canvasWidth - 1) % UNITS)
                     }
-                    if (y >= CANVAS_HEIGHT) {
+                    if (y >= canvasHeight) {
                         y = 0
                     } else if (y < 0) {
-                        y = (CANVAS_HEIGHT - 1) - ((CANVAS_HEIGHT - 1) % UNITS)
+                        y = (canvasHeight - 1) - ((canvasHeight - 1) % UNITS)
                     }
 
                     // Update this ant's state
@@ -300,7 +304,7 @@
             step()
         }
 
-        langtonAntCanvas()
+        addEventListener('DOMContentLoaded', (_) => langtonAntCanvas());
     </script>
 </body>
 
