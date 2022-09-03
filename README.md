@@ -1,5 +1,5 @@
 # :ant: virtual-ants
-> My blog post: [Building My Own Chess Engine](https://healeycodes.com/virtual-ants/)
+> My blog post: [Virtual Ants](https://healeycodes.com/virtual-ants/)
 
 <br>
 
