@@ -3,7 +3,7 @@
 
 <br>
 
-A playground for Langton's Ant, written with vanilla HTML, CSS, and JavaScript, in a single index.html file.
+A playground for Langton's Ant, written in a few hours with vanilla HTML, CSS, and JavaScript, in a single index.html file.
 
 <br>
 
